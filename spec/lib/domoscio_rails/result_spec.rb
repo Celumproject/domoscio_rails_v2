@@ -9,6 +9,7 @@ describe DomoscioRails::Result do
   created_success2 = nil
   created_failure2 = nil
   created_success3 = nil
+  created_success_without_response = nil
   
   created_knowledge_node_student = nil
   created_knowledge_node = nil
@@ -56,12 +57,17 @@ describe DomoscioRails::Result do
     end
   end
   
+  describe 'CREATE WITH NO RESULT' do
+    it 'creates a new result expecting no_response' do
+      created_success_without_response = new_result_thrd_success_no_response
+      expect(created_success_without_response).to be_empty
+    end
+  end
+  
   describe 'FETCH' do
     it 'fetches the knowledge_node_student for the created result' do
       kns = DomoscioRails::KnowledgeNodeStudent.fetch(created_success2["knowledge_node_student_id"])
-      pp kns
       expect(kns["history"]).to eq("101")
-      expect(kns["current_review_interv"]).to eq(current_review_interv)
     end
   end
   

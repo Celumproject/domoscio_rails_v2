@@ -19,6 +19,7 @@ require 'domoscio_rails/knowledge/knowledge_edge'
 require 'domoscio_rails/knowledge/knowledge_node'
 require 'domoscio_rails/data/knowledge_node_student'
 require 'domoscio_rails/data/result'
+require 'domoscio_rails/utils/review_util'
 
 
 module DomoscioRails
@@ -26,14 +27,18 @@ module DomoscioRails
   class Configuration
     attr_accessor :preproduction, :root_url,
     :client_id, :client_passphrase,
-    :temp_dir
+    :temp_dir, :disabled
+    
+    def disabled
+      @disabled || false
+    end
 
     def preproduction
       @preproduction || false
     end
 
     def root_url
-      @root_url || (@preproduction == true  ? "http://domoscio-stats-engine-api.herokuapp.com/" : "")
+      @root_url || (@preproduction == true  ? "http://stats-engine.domoscio.com" : "http://localhost:3000/")
     end
   end
 
@@ -61,8 +66,9 @@ module DomoscioRails
   # Raises DomoscioRails::ResponseError if response code != 200.
   #
   def self.request(method, url, params={}, filters={}, headers = request_headers, before_request_proc = nil)
+    return false if @disabled
     uri = api_uri(url)
-    uri.query = URI.encode_www_form(filters) unless filters.empty?
+    uri.query = URI.encode_www_form(filters) unless filters.empty?    
     
     res = Net::HTTP.start(uri.host, uri.port) do |http| # , use_ssl: uri.scheme == 'https') do |http|
       req = Net::HTTP::const_get(method.capitalize).new(uri.request_uri, headers)

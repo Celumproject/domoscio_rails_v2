@@ -55,5 +55,18 @@ module DomoscioRails
       end      
     end
     
+    module Util
+      module ClassMethods
+        def util(id = nil, util_name = nil, params = {})
+          DomoscioRails.request(:get, url(id, util_name), params)
+        end
+      end
+
+      def self.included(base)
+        base.extend(ClassMethods)
+      end      
+    end
+    
+    
   end
 end

@@ -101,6 +101,14 @@ shared_context 'knowledge_node_students' do
       knowledge_node_id: new_knowledge_node_source["id"]
     })
   }
+  
+  let(:new_knowledge_node_student_with_next_review_at) {
+    DomoscioRails::KnowledgeNodeStudent.create({
+      student_id: new_student["id"],
+      knowledge_node_id: new_knowledge_node_source["id"],
+      next_review_at: DateTime.now
+    })
+  }
 
 end
 
@@ -113,26 +121,40 @@ shared_context 'results' do
   let(:new_result_success) {
     DomoscioRails::Result.create({
       :knowledge_node_student_id => new_knowledge_node_student["id"],
-      :value => 1,
-      :expected_at => DateTime.now
+      :value => 1
     })
   }
   
   let(:new_result_failure) {
     DomoscioRails::Result.create({
       :knowledge_node_student_id => new_knowledge_node_student["id"],
-      :value => 0,
-      :expected_at => DateTime.now
+      :value => 0
     })
   }
   
   let(:new_result_scd_success) {
     DomoscioRails::Result.create({
       :knowledge_node_student_id => new_knowledge_node_student["id"],
-      :value => 1,
-      :expected_at => DateTime.now
+      :value => 1
     })
   }
+  
+  let(:new_result_thrd_success_no_response) {
+    DomoscioRails::Result.create({
+      :knowledge_node_student_id => new_knowledge_node_student["id"],
+      :value => 1,
+      :no_response => true
+    })
+  }
+
+end
+
+###############################################
+shared_context 'review_utils' do
+###############################################
+  include_context 'knowledge_node_students'
+  include_context 'results'
+
 
 end
 
