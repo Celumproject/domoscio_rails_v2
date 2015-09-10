@@ -26,7 +26,7 @@ require 'domoscio_rails/metadata/tagging'
 require 'domoscio_rails/metadata/tag_set'
 require 'domoscio_rails/metadata/tag_edge'
 require 'domoscio_rails/data/knowledge_node_student'
-require 'domoscio_rails/data/result'
+require 'domoscio_rails/data/event'
 require 'domoscio_rails/utils/review_util'
 
 
@@ -46,7 +46,7 @@ module DomoscioRails
     end
 
     def root_url
-      @root_url || (@preproduction == true  ? "http://stats-engine.domoscio.com" : "http://localhost:3000/")
+      @root_url || (@preproduction == true  ? "http://stats-engine.domoscio.com" : "http://localhost:3001/")
     end
   end
 
