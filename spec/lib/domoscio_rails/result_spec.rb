@@ -1,7 +1,7 @@
 require_relative '../../spec_helper'
 
-describe DomoscioRails::Result do
-  include_context 'results'
+describe DomoscioRails::Event do
+  include_context 'events'
   
   created_success = nil
   created_failure = nil
@@ -23,7 +23,7 @@ describe DomoscioRails::Result do
     it 'creates a new result to the company' do
       created_success = new_result_success
       created_failure = new_result_failure
-      expect(created_success["value"]).to eq(1)
+      expect(created_success["value"]).to eq(100)
       expect(created_failure["value"]).to eq(0)
       expect(DateTime.parse(created_success["expected_at"])).to be_kind_of(DateTime)
       expect(DateTime.parse(created_failure["expected_at"])).to be_kind_of(DateTime)
@@ -32,7 +32,7 @@ describe DomoscioRails::Result do
 
   describe 'FETCH' do
     it 'fetches all the results of the company' do
-      results = DomoscioRails::Result.fetch()
+      results = DomoscioRails::Event.fetch()
       expect(results).to be_kind_of(Array)
       expect(results.map{|res| res["id"]}).to include(created_success["id"])
       expect(results.map{|res| res["id"]}).to include(created_failure["id"])
@@ -73,15 +73,15 @@ describe DomoscioRails::Result do
   
   describe 'DESTROY' do
     it 'destroys the created results of the company' do
-      DomoscioRails::Result.destroy(created_success["id"])
-      DomoscioRails::Result.destroy(created_failure["id"])
-      DomoscioRails::Result.destroy(created_success2["id"])
+      DomoscioRails::Event.destroy(created_success["id"])
+      DomoscioRails::Event.destroy(created_failure["id"])
+      DomoscioRails::Event.destroy(created_success2["id"])
     end
   end
 
   describe 'FETCH' do
     it 'fetches all the results of the company and checks the destroyed results are not present' do
-      results = DomoscioRails::Result.fetch()
+      results = DomoscioRails::Event.fetch()
       expect(results).to be_kind_of(Array)
       expect(results.map{|res| res["id"]}).not_to include(created_failure["id"])
       expect(results.map{|res| res["id"]}).not_to include(created_success["id"])
@@ -93,7 +93,7 @@ describe DomoscioRails::Result do
       created_knowledge_node_student = DomoscioRails::KnowledgeNodeStudent.fetch(created_failure["knowledge_node_student_id"])
       created_knowledge_node = DomoscioRails::KnowledgeNode.fetch(created_knowledge_node_student["knowledge_node_id"])
       created_knowledge_graph = DomoscioRails::KnowledgeGraph.fetch(created_knowledge_node["knowledge_graph_id"])
-      created_student = DomoscioRails::Student.fetch(created_knowledge_node_student["student_id"])
+      created_student = DomoscioRails::Student.fetch(created_knowledge_node_student["student_id"]).first
     end
   end
 
@@ -102,6 +102,7 @@ describe DomoscioRails::Result do
       DomoscioRails::KnowledgeNodeStudent.destroy(created_knowledge_node_student["id"])
       DomoscioRails::KnowledgeNode.destroy(created_knowledge_node["id"])
       DomoscioRails::KnowledgeGraph.destroy(created_knowledge_graph["id"])
+      puts "HERE:" + created_student.inspect
       DomoscioRails::Student.destroy(created_student["id"])
       
       kncs = DomoscioRails::KnowledgeNodeStudent.fetch()

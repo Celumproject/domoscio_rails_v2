@@ -6,18 +6,20 @@ module DomoscioRails
         name.split('::')[-1]
       end
 
-      def url(id = nil, util_name = nil)
+      def url(id = nil, util_name = nil, on_self = nil )
         if self == Resource
           raise NotImplementedError.new('Resource is an abstract class. Do not use it directly.')
         end
         
         build_url = "/v1/instances/#{DomoscioRails.configuration.client_id}"
-        build_url << "/#{class_name.underscore}s"
-        if util_name
-          build_url << "/#{util_name}"
-        end
-        if id
-          build_url << "/#{CGI.escape(id.to_s)}"
+        if !on_self
+          build_url << "/#{class_name.underscore}s"
+          if util_name
+            build_url << "/#{util_name}"
+          end
+          if id
+            build_url << "/#{CGI.escape(id.to_s)}"
+          end
         end
         return build_url  
       end

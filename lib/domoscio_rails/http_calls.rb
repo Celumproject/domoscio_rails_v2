@@ -25,6 +25,18 @@ module DomoscioRails
         base.extend(ClassMethods)
       end
     end
+    
+    module UpdateSelf
+      module ClassMethods
+        def update_self(params = {})
+          DomoscioRails.request(:put, url(nil, nil, true), params)
+        end
+      end
+
+      def self.included(base)
+        base.extend(ClassMethods)
+      end
+    end
 
     module Fetch
       module ClassMethods

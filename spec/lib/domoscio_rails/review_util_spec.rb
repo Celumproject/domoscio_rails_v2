@@ -5,10 +5,7 @@ describe DomoscioRails::ReviewUtil do
   
   created_success = nil
   
-  created_knowledge_node_student_with_next_review_at = nil
-  created_knowledge_node_with_next_review_at = nil
-  created_knowledge_graph_with_next_review_at =  nil
-  created_student_with_next_review_at = nil
+  updated_knowledge_node_with_next_review_at = nil  
   
   created_knowledge_node_student_from_success = nil
   created_knowledge_node_from_success = nil
@@ -24,7 +21,7 @@ describe DomoscioRails::ReviewUtil do
     it 'creates a new knowledge_node_student and student to the company' do
       created_student = new_student
       created_knowledge_node_student = new_knowledge_node_student
-      created_knowledge_node_student_with_next_review_at = new_knowledge_node_student_with_next_review_at
+      #created_knowledge_node_student_with_next_review_at = new_knowledge_node_student_with_next_review_at
     end
   end
   
@@ -34,10 +31,16 @@ describe DomoscioRails::ReviewUtil do
       expect(reviews).to be_kind_of(Array)
       
       expect(reviews).not_to include(created_knowledge_node_student)
-      expect(reviews).to include(created_knowledge_node_student_with_next_review_at)
+      
+      
+      DomoscioRails::KnowledgeNodeStudent.update(created_knowledge_node_student["id"], {next_review_at: DateTime.now})
+      updated_knowledge_node_student_with_next_review_at = DomoscioRails::KnowledgeNodeStudent.fetch(created_knowledge_node_student["id"])
+      
+      reviews = DomoscioRails::ReviewUtil.util(nil, "fetch_reviews", student_id: created_student["id"].to_s)
+      expect(reviews.map{|rev| rev["id"]}).to include(updated_knowledge_node_student_with_next_review_at["id"])
             
       pending_reviews = DomoscioRails::ReviewUtil.util(nil, "fetch_reviews", student_id: created_student["id"].to_s, :pending => true)
-      expect(reviews).to include(created_knowledge_node_student_with_next_review_at)
+      expect(pending_reviews.map{|rev| rev["id"]}).to include(updated_knowledge_node_student_with_next_review_at["id"])
       
       pending_reviews.each do |rev|
         expect(rev["next_review_at"]).to be < DateTime.now
@@ -49,11 +52,8 @@ describe DomoscioRails::ReviewUtil do
     it 'fetches the associated models to the newly created knowledge_node_student' do
       created_knowledge_node = DomoscioRails::KnowledgeNode.fetch(created_knowledge_node_student["knowledge_node_id"])
       created_knowledge_graph = DomoscioRails::KnowledgeGraph.fetch(created_knowledge_node["knowledge_graph_id"])
-      created_student = DomoscioRails::Student.fetch(created_knowledge_node_student["student_id"])
+      created_student = DomoscioRails::Student.fetch(created_knowledge_node_student["student_id"]).first
       
-      created_knowledge_node_with_next_review_at = DomoscioRails::KnowledgeNode.fetch(created_knowledge_node_student_with_next_review_at["knowledge_node_id"])
-      created_knowledge_graph_with_next_review_at = DomoscioRails::KnowledgeGraph.fetch(created_knowledge_node_with_next_review_at["knowledge_graph_id"])
-      created_student_with_next_review_at = DomoscioRails::Student.fetch(created_knowledge_node_student_with_next_review_at["student_id"])
     end
   end
 
@@ -67,20 +67,20 @@ describe DomoscioRails::ReviewUtil do
   describe 'FETCH' do
     it 'fetches all the reviews of a user' do
       
-      reviews = DomoscioRails::ReviewUtil.util(nil, "fetch_reviews", student_id: created_knowledge_node_student_from_success["student_id"].to_s)
+      reviews = DomoscioRails::ReviewUtil.util(nil, "fetch_reviews", student_id: created_knowledge_node_student_from_success["student_id"].to_s).map{|rev| rev["id"]}
       expect(reviews).to be_kind_of(Array)
       
-      expect(reviews).to include(created_knowledge_node_student_from_success)
+      expect(reviews).to include(created_knowledge_node_student_from_success["id"])
             
-      pending_reviews = DomoscioRails::ReviewUtil.util(nil, "fetch_reviews", student_id: created_knowledge_node_student_from_success["student_id"].to_s, :pending => true)
-      expect(pending_reviews).not_to include(created_knowledge_node_student_from_success)
+      pending_reviews = DomoscioRails::ReviewUtil.util(nil, "fetch_reviews", student_id: created_knowledge_node_student_from_success["student_id"].to_s, :pending => true).map{|rev| rev["id"]}
+      expect(pending_reviews).not_to include(created_knowledge_node_student_from_success["id"])
       
     end
   end
 
   describe 'DESTROY' do
     it 'destroys the created results of the company' do
-      DomoscioRails::Result.destroy(created_success["id"])
+      DomoscioRails::Event.destroy(created_success["id"])
     end
   end
 
@@ -88,7 +88,7 @@ describe DomoscioRails::ReviewUtil do
     it 'fetches the associated models to the newly created result' do
       created_knowledge_node_from_success = DomoscioRails::KnowledgeNode.fetch(created_knowledge_node_student_from_success["knowledge_node_id"])
       created_knowledge_graph_from_success = DomoscioRails::KnowledgeGraph.fetch(created_knowledge_node_from_success["knowledge_graph_id"])
-      created_student_from_success = DomoscioRails::Student.fetch(created_knowledge_node_student_from_success["student_id"])
+      created_student_from_success = DomoscioRails::Student.fetch(created_knowledge_node_student_from_success["student_id"]).first
     end
   end
 
@@ -103,11 +103,6 @@ describe DomoscioRails::ReviewUtil do
       DomoscioRails::KnowledgeNode.destroy(created_knowledge_node_from_success["id"])
       DomoscioRails::KnowledgeGraph.destroy(created_knowledge_graph_from_success["id"])
       DomoscioRails::Student.destroy(created_student_from_success["id"])
-      
-      DomoscioRails::KnowledgeNodeStudent.destroy(created_knowledge_node_student_with_next_review_at["id"])
-      DomoscioRails::KnowledgeNode.destroy(created_knowledge_node_with_next_review_at["id"])
-      DomoscioRails::KnowledgeGraph.destroy(created_knowledge_graph_with_next_review_at["id"])
-      DomoscioRails::Student.destroy(created_student_with_next_review_at["id"])
       
       kncs = DomoscioRails::KnowledgeNodeStudent.fetch()
       expect(kncs).to be_kind_of(Array)

@@ -16,5 +16,6 @@ gemspec
 gem 'rspec'
 gem 'capybara'
 gem 'capybara-webkit'
+gem 'multi_json'
 
 #gem 'pp'
