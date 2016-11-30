@@ -1,3 +1,3 @@
 module DomoscioRails
-  VERSION = "0.0.13"
+  VERSION = "0.2.5"
 end

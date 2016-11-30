@@ -12,11 +12,15 @@ require 'domoscio_rails/authorization_token'
 # resources
 require 'domoscio_rails/http_calls'
 require 'domoscio_rails/resource'
-require 'domoscio_rails/adaptative/path_rule'
-require 'domoscio_rails/adaptative/rule_input'
-require 'domoscio_rails/adaptative/rule_output'
-require 'domoscio_rails/adaptative/rule_condition'
+require 'domoscio_rails/adaptative/deterministic/path_rule'
+require 'domoscio_rails/adaptative/deterministic/rule_input'
+require 'domoscio_rails/adaptative/deterministic/rule_output'
+require 'domoscio_rails/adaptative/deterministic/rule_condition'
+require 'domoscio_rails/adaptative/predictive/objective'
 require 'domoscio_rails/adaptative/recommendation'
+require 'domoscio_rails/path/learning_path'
+require 'domoscio_rails/content/content'
+require 'domoscio_rails/content/knowledge_node_content'
 require 'domoscio_rails/admin/user'
 require 'domoscio_rails/student/student'
 require 'domoscio_rails/knowledge/knowledge_graph'
@@ -36,7 +40,7 @@ module DomoscioRails
   class Configuration
     attr_accessor :preproduction, :root_url,
     :client_id, :client_passphrase,
-    :temp_dir, :disabled
+    :temp_dir, :disabled, :version
     
     def disabled
       @disabled || false
@@ -45,9 +49,13 @@ module DomoscioRails
     def preproduction
       @preproduction || false
     end
+    
+    def version
+      @version || 1
+    end
 
     def root_url
-      @root_url || (@preproduction == true  ? "http://stats-engine.domoscio.com" : "http://localhost:3001/")
+      @root_url || (@preproduction == true  ? ( @version > 1 ? "http://api.domoscio.com" : "http://stats-engine-api.domoscio.com" )  : "http://localhost:3001/")
     end
   end
 

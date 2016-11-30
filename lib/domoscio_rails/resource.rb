@@ -11,7 +11,7 @@ module DomoscioRails
           raise NotImplementedError.new('Resource is an abstract class. Do not use it directly.')
         end
         
-        build_url = "/v1/instances/#{DomoscioRails.configuration.client_id}"
+        build_url = "/v#{DomoscioRails.configuration.version}/instances/#{DomoscioRails.configuration.client_id}"
         if !on_self
           build_url << "/#{class_name.underscore}s"
           if util_name
