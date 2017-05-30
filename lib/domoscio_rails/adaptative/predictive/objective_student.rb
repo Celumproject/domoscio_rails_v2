@@ -1,6 +1,6 @@
 module DomoscioRails
-  # A KnowledgeNodeContent.
-  class KnowldegeNodeContent < Resource
+  # An objective student.
+  class ObjectiveStudent < Resource
     include DomoscioRails::HTTPCalls::Create
     include DomoscioRails::HTTPCalls::Fetch
     include DomoscioRails::HTTPCalls::Update
