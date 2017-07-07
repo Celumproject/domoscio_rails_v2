@@ -22,7 +22,6 @@ require 'domoscio_rails/adaptative/recommendation'
 require 'domoscio_rails/path/learning_path'
 require 'domoscio_rails/content/content'
 require 'domoscio_rails/content/knowledge_node_content'
-require 'domoscio_rails/admin/user'
 require 'domoscio_rails/student/student'
 require 'domoscio_rails/student/student_cluster'
 require 'domoscio_rails/knowledge/knowledge_graph'
@@ -58,7 +57,7 @@ module DomoscioRails
     end
 
     def root_url
-      @root_url || (@preproduction == true  ? ( @version > 1 ? "http://api.domoscio.com" : "http://stats-engine-api.domoscio.com" )  : "http://localhost:3001/")
+      @root_url || (@preproduction == true  ? ( @version > 1 ? "http://api.domoscio.com" : "http://stats-engine.domoscio.com" )  : "http://localhost:3001/")
     end
   end
 
@@ -100,6 +99,7 @@ module DomoscioRails
     # decode json data
     begin
       data = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
+      DomoscioRails::AuthorizationToken::Manager.storage.store({access_token: res['Accesstoken'], refresh_token: res['Refreshtoken']})
     rescue MultiJson::LoadError
       data = {}
     end
@@ -146,16 +146,23 @@ module DomoscioRails
 
   def self.request_headers
     auth_token = DomoscioRails::AuthorizationToken::Manager.get_token
-    headers = {
-      'user_agent' => "DomoscioRails V2 RubyBindings/#{DomoscioRails::VERSION}",
-      'Authorization' => "Token token=#{DomoscioRails.configuration.client_passphrase}",#"#{auth_token['token_type']} #{auth_token['access_token']}",
-      'Content-Type' => 'application/json'
-    }
-    # begin
-#       headers.update('x_mangopay_client_user_agent' => DomoscioRails::JSON.dump(user_agent))
-#     rescue => e
-#       headers.update('x_mangopay_client_raw_user_agent' => user_agent.inspect, error: "#{e} (#{e.class})")
-#     end
+    
+    if !auth_token.is_a? String
+      headers = {
+        'user_agent' => "DomoscioRails V2 RubyBindings/#{DomoscioRails::VERSION}",
+        'AccessToken' => "#{auth_token[:access_token]}",
+        'RefreshToken' => "#{auth_token[:refresh_token]}",
+        'Content-Type' => 'application/json'
+      }
+    else
+      headers = {
+        'user_agent' => "DomoscioRails V2 RubyBindings/#{DomoscioRails::VERSION}",
+        'Authorization' => "Token token=#{DomoscioRails.configuration.client_passphrase}",#"#{auth_token['token_type']} #{auth_token['access_token']}",
+        'Content-Type' => 'application/json'
+      }
+    end
+    headers
+
   end
   
   

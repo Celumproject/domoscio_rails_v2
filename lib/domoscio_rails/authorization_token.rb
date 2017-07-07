@@ -13,17 +13,8 @@ module DomoscioRails
         end
 
         def get_token
-          # token = storage.get
-          #           if token.nil? || token['timestamp'].nil? || token['timestamp'] <= Time.now
-          #             token = DomoscioRails.request(:post, '/api/oauth/token', {}, {}, {}, Proc.new do |req|
-          #               cfg = DomoscioRails.configuration
-          #               req.basic_auth cfg.client_id, cfg.client_passphrase
-          #               req.body = 'grant_type=client_credentials'
-          #             end)
-          #             token['timestamp'] = Time.now + token['expires_in'].to_i
-          #             storage.store token
-          #           end
-          token = DomoscioRails.configuration.client_passphrase
+          token = storage.get
+          token = DomoscioRails.configuration.client_passphrase if token.nil?
           token
         end
       end

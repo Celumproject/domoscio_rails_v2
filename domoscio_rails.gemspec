@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email       = ["benoit.praly@domoscio.com"]
   s.homepage    = "http://www.domoscio.com"
   s.summary     = "Summary of DomoscioRails."
-  s.description = "Description of DomoscioRails."
+  s.description = "Ruby client to interact with Domoscio API."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
