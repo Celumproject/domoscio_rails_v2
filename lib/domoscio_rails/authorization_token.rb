@@ -5,7 +5,7 @@ module DomoscioRails
 
       class << self
         def storage
-          @@storage ||= StaticStorage.new
+          @@storage ||= FileStorage.new
         end
 
         def storage= (storage)
