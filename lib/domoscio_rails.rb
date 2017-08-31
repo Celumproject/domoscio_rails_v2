@@ -54,12 +54,24 @@ module DomoscioRails
       @preproduction || false
     end
     
+    def test
+      @test || false
+    end
+    
     def version
       @version || 1
     end
 
     def root_url
-      @root_url || (@preproduction == true  ? ( @version > 1 ? "http://api.domoscio.com" : "http://stats-engine.domoscio.com" )  : "http://localhost:3001/")
+      if @preproduction == true
+        if @test == true
+          @root_url || "https://domoscio-adaptive-engine-staging.azurewebsites.net"
+        else
+          @root_url || "https://domoscio-adaptive-engine.azurewebsites.net"
+        end
+      else
+        @root_url || "http://localhost:3000"
+      end
     end
   end
 
