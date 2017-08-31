@@ -42,7 +42,7 @@ require 'domoscio_rails/utils/gameplay_util'
 module DomoscioRails
 
   class Configuration
-    attr_accessor :preproduction, :root_url,
+    attr_accessor :preproduction, :test, :root_url,
     :client_id, :client_passphrase,
     :temp_dir, :disabled, :version
     
