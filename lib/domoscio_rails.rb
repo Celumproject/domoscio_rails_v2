@@ -70,7 +70,7 @@ module DomoscioRails
           @root_url || "https://domoscio-adaptive-engine.azurewebsites.net"
         end
       else
-        @root_url || "http://localhost:3000/"
+        @root_url || "http://localhost:3000"
       end
     end
   end
@@ -103,11 +103,7 @@ module DomoscioRails
     uri = api_uri(url)
     uri.query = URI.encode_www_form(filters) unless filters.empty?    
     
-    res = Net::HTTP.start(uri.host, uri.port) do |http| # , use_ssl: uri.scheme == 'https') do |http|
-      if @preproduction
-        http.use_ssl = true
-        uri.scheme == 'https'
-      end
+    res = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http| # , use_ssl: uri.scheme == 'https') do |http|
       req = Net::HTTP::const_get(method.capitalize).new(uri.request_uri, headers)
       req.body = DomoscioRails::JSON.dump(params)
       before_request_proc.call(req) if before_request_proc
