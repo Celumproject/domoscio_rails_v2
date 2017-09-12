@@ -65,12 +65,12 @@ module DomoscioRails
     def root_url
       if @preproduction == true
         if @test == true
-          @root_url || "https://domoscio-adaptive-engine-staging.azurewebsites.net"
+          @root_url || "https://domoscio-adaptive-engine-staging.azurewebsites.net/"
         else
-          @root_url || "https://domoscio-adaptive-engine.azurewebsites.net"
+          @root_url || "https://domoscio-adaptive-engine.azurewebsites.net/"
         end
       else
-        @root_url || "http://localhost:3000"
+        @root_url || "http://localhost:3000/"
       end
     end
   end
@@ -102,7 +102,7 @@ module DomoscioRails
     return false if @disabled
     uri = api_uri(url)
     uri.query = URI.encode_www_form(filters) unless filters.empty?    
-    
+    puts uri.inspect
     res = Net::HTTP.start(uri.host, uri.port) do |http| # , use_ssl: uri.scheme == 'https') do |http|
       req = Net::HTTP::const_get(method.capitalize).new(uri.request_uri, headers)
       req.body = DomoscioRails::JSON.dump(params)
