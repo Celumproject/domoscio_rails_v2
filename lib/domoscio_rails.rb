@@ -106,7 +106,7 @@ module DomoscioRails
     res = Net::HTTP.start(uri.host, uri.port) do |http| # , use_ssl: uri.scheme == 'https') do |http|
       if @preproduction
         http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        uri.scheme == 'https'
       end
       req = Net::HTTP::const_get(method.capitalize).new(uri.request_uri, headers)
       req.body = DomoscioRails::JSON.dump(params)
