@@ -1,5 +1,5 @@
   
-require 'net/http'
+require 'net/https'
 require 'cgi/util'
 require 'multi_json'
 
