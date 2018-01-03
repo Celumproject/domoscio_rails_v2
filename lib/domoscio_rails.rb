@@ -38,6 +38,7 @@ require 'domoscio_rails/data/knowledge_node_student'
 require 'domoscio_rails/data/event'
 require 'domoscio_rails/utils/review_util'
 require 'domoscio_rails/utils/gameplay_util'
+require 'domosico_rails/utils/alerts_util'
 
 
 module DomoscioRails
