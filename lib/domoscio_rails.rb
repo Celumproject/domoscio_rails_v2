@@ -94,18 +94,31 @@ module DomoscioRails
     uri = api_uri(url)
     uri.query = URI.encode_www_form(filters) unless filters.empty?    
     
-    res = Net::HTTP.start(uri.host, uri.port) do |http| # , use_ssl: uri.scheme == 'https') do |http|
-      req = Net::HTTP::const_get(method.capitalize).new(uri.request_uri, headers)
-      req.body = DomoscioRails::JSON.dump(params)
-      before_request_proc.call(req) if before_request_proc
-      http.request req
-    end
-
+    res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
+    
     # decode json data
     begin
       data = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
     rescue MultiJson::LoadError
       data = {}
+    end
+
+    if res['Total']
+      pagetotal = (res['Total'].to_i / res['Per-Page'].to_f).ceil
+      
+      for j in 2..pagetotal
+        params.merge({page: j})
+        res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
+
+        # decode json data
+        begin
+          data += DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
+          data.flatten!
+        rescue MultiJson::LoadError
+          data = {}
+        end
+        
+      end
     end
 
     ############### TEMP!!!! #######################################################
@@ -126,6 +139,16 @@ module DomoscioRails
 #     }
 
     data
+  end
+
+
+  def self.send_request(uri, method, params, headers, before_request_proc)
+    res = Net::HTTP.start(uri.host, uri.port) do |http| # , use_ssl: uri.scheme == 'https') do |http|
+      req = Net::HTTP::const_get(method.capitalize).new(uri.request_uri, headers)
+      req.body = DomoscioRails::JSON.dump(params)
+      before_request_proc.call(req) if before_request_proc
+      http.request req
+    end
   end
 
   private
