@@ -107,7 +107,7 @@ module DomoscioRails
       pagetotal = (res['Total'].to_i / res['Per-Page'].to_f).ceil
       
       for j in 2..pagetotal
-        params.merge({page: j})
+        params = params.merge({page: j})
         res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
 
         # decode json data
