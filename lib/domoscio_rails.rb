@@ -17,8 +17,8 @@ require 'domoscio_rails/adaptative/deterministic/rule_input'
 require 'domoscio_rails/adaptative/deterministic/rule_output'
 require 'domoscio_rails/adaptative/deterministic/rule_condition'
 require 'domoscio_rails/adaptative/predictive/objective'
-require 'domoscio_rails/adaptative/predictive/objective_knowledge_node'
 require 'domoscio_rails/adaptative/predictive/objective_student'
+require 'domoscio_rails/adaptative/predictive/objective_knowledge_node'
 require 'domoscio_rails/adaptative/predictive/objective_knowledge_node_student'
 require 'domoscio_rails/adaptative/recommendation'
 require 'domoscio_rails/path/learning_path'
@@ -37,6 +37,8 @@ require 'domoscio_rails/data/knowledge_node_student'
 require 'domoscio_rails/data/event'
 require 'domoscio_rails/utils/review_util'
 require 'domoscio_rails/utils/gameplay_util'
+require 'domoscio_rails/utils/alerts_util'
+require 'domoscio_rails/utils/recommendation_util'
 
 
 module DomoscioRails
@@ -103,19 +105,32 @@ module DomoscioRails
     uri = api_uri(url)
     uri.query = URI.encode_www_form(filters) unless filters.empty?    
     
-    res = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http| # , use_ssl: uri.scheme == 'https') do |http|
-      req = Net::HTTP::const_get(method.capitalize).new(uri.request_uri, headers)
-      req.body = DomoscioRails::JSON.dump(params)
-      before_request_proc.call(req) if before_request_proc
-      http.request req
-    end
-
+    res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
+    
     # decode json data
     begin
       data = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
       DomoscioRails::AuthorizationToken::Manager.storage.store({access_token: res['Accesstoken'], refresh_token: res['Refreshtoken']})
     rescue MultiJson::LoadError
       data = {}
+    end
+
+    if res['Total']
+      pagetotal = (res['Total'].to_i / res['Per-Page'].to_f).ceil
+      
+      for j in 2..pagetotal
+        params = params.merge({page: j})
+        res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
+
+        # decode json data
+        begin
+          data += DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
+          data.flatten!
+        rescue MultiJson::LoadError
+          data = {}
+        end
+        
+      end
     end
 
     ############### TEMP!!!! #######################################################
@@ -136,6 +151,16 @@ module DomoscioRails
 #     }
 
     data
+  end
+
+
+  def self.send_request(uri, method, params, headers, before_request_proc)
+    res = Net::HTTP.start(uri.host, uri.port) do |http| # , use_ssl: uri.scheme == 'https') do |http|
+      req = Net::HTTP::const_get(method.capitalize).new(uri.request_uri, headers)
+      req.body = DomoscioRails::JSON.dump(params)
+      before_request_proc.call(req) if before_request_proc
+      http.request req
+    end
   end
 
   private
