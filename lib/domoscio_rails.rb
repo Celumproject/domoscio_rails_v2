@@ -155,7 +155,7 @@ module DomoscioRails
 
 
   def self.send_request(uri, method, params, headers, before_request_proc)
-    res = Net::HTTP.start(uri.host, uri.port) do |http| # , use_ssl: uri.scheme == 'https') do |http|
+    res = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http| # , use_ssl: uri.scheme == 'https') do |http|
       req = Net::HTTP::const_get(method.capitalize).new(uri.request_uri, headers)
       req.body = DomoscioRails::JSON.dump(params)
       before_request_proc.call(req) if before_request_proc
