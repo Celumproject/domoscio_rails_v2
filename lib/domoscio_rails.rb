@@ -72,7 +72,7 @@ module DomoscioRails
           @root_url || "https://domoscio-adaptive-engine.azurewebsites.net"
         end
       else
-        @root_url || "http://localhost:3000"
+        @root_url || "http://localhost:3001"
       end
     end
   end
