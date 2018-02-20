@@ -1,4 +1,4 @@
-  
+
 require 'net/http'
 require 'cgi/util'
 require 'multi_json'
@@ -48,7 +48,7 @@ module DomoscioRails
     attr_accessor :preproduction, :root_url,
     :client_id, :client_passphrase,
     :temp_dir, :disabled, :version
-    
+
     def disabled
       @disabled || false
     end
@@ -56,7 +56,7 @@ module DomoscioRails
     def preproduction
       @preproduction || false
     end
-    
+
     def version
       @version || 1
     end
@@ -92,10 +92,10 @@ module DomoscioRails
   def self.request(method, url, params={}, filters={}, headers = request_headers, before_request_proc = nil)
     return false if @disabled
     uri = api_uri(url)
-    uri.query = URI.encode_www_form(filters) unless filters.empty?    
-    
+    uri.query = URI.encode_www_form(filters) unless filters.empty?
+
     res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
-    
+
     # decode json data
     begin
       data = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
@@ -103,9 +103,9 @@ module DomoscioRails
       data = {}
     end
 
-    if res['Total']
+    if res['Total'] && !filters[:page]
       pagetotal = (res['Total'].to_i / res['Per-Page'].to_f).ceil
-      
+
       for j in 2..pagetotal
         params = params.merge({page: j})
         res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
@@ -117,7 +117,7 @@ module DomoscioRails
         rescue MultiJson::LoadError
           data = {}
         end
-        
+
       end
     end
 
@@ -184,6 +184,6 @@ module DomoscioRails
 #       headers.update('x_mangopay_client_raw_user_agent' => user_agent.inspect, error: "#{e} (#{e.class})")
 #     end
   end
-  
-  
+
+
 end
