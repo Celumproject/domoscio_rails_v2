@@ -39,7 +39,7 @@ require 'domoscio_rails/utils/review_util'
 require 'domoscio_rails/utils/gameplay_util'
 require 'domoscio_rails/utils/alerts_util'
 require 'domoscio_rails/utils/recommendation_util'
-
+require 'domoscio_rails/metadata/delta_object'
 
 module DomoscioRails
 
