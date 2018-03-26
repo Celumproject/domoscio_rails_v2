@@ -72,13 +72,15 @@ module DomoscioRails
         def util(id = nil, util_name = nil, params = {})
           DomoscioRails.request(:get, url(id, util_name), params)
         end
+        def util_post(id = nil, util_name = nil, params = {})
+          DomoscioRails.request(:post, url(id, util_name), params)
+        end
       end
 
       def self.included(base)
         base.extend(ClassMethods)
       end      
     end
-    
     
   end
 end
