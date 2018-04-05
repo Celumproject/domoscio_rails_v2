@@ -110,7 +110,7 @@ module DomoscioRails
     # decode json data
     begin
       data = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
-      unless res.kind_of? Net::HTTPClientError || res.kind_of? Net::HTTPServerError
+      unless (res.kind_of? Net::HTTPClientError) || (res.kind_of? Net::HTTPServerError)
         DomoscioRails::AuthorizationToken::Manager.storage.store({access_token: res['Accesstoken'], refresh_token: res['Refreshtoken']})
       end
     rescue MultiJson::LoadError
