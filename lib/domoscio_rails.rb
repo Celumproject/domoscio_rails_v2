@@ -44,7 +44,7 @@ require 'domoscio_rails/metadata/delta_object'
 module DomoscioRails
 
   class Configuration
-    attr_accessor :preproduction, :test, :root_url,
+    attr_accessor :preproduction, :test, :dev, :root_url,
     :client_id, :client_passphrase,
     :temp_dir, :disabled, :version
 
