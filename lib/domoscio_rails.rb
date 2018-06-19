@@ -60,6 +60,10 @@ module DomoscioRails
       @test || false
     end
 
+    def dev
+      @dev || false
+    end
+
     def version
       @version || 1
     end
@@ -68,6 +72,8 @@ module DomoscioRails
       if @preproduction == true
         if @test == true
           @root_url || "https://domoscio-adaptive-engine-staging.azurewebsites.net"
+        elsif @dev == true
+          @root_url || "https://domoscio-adaptive-engine-preprod.azurewebsites.net"
         else
           @root_url || "https://domoscio-adaptive-engine.azurewebsites.net"
         end
