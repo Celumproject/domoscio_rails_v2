@@ -1,6 +1,6 @@
 module DomoscioRails
   module HTTPCalls
-    
+
     module Create
       module ClassMethods
         def create(*id, params)
@@ -25,7 +25,7 @@ module DomoscioRails
         base.extend(ClassMethods)
       end
     end
-    
+
     module UpdateSelf
       module ClassMethods
         def update_self(params = {})
@@ -54,7 +54,7 @@ module DomoscioRails
         id_or_filters.is_a?(Hash) ? [nil, id_or_filters] : [id_or_filters, {}]
       end
     end
-    
+
     module Destroy
       module ClassMethods
         def destroy(id = nil, params = {})
@@ -64,9 +64,9 @@ module DomoscioRails
 
       def self.included(base)
         base.extend(ClassMethods)
-      end      
+      end
     end
-    
+
     module Util
       module ClassMethods
         def util(id = nil, util_name = nil, params = {})
@@ -79,9 +79,9 @@ module DomoscioRails
 
       def self.included(base)
         base.extend(ClassMethods)
-      end      
+      end
     end
-    
-    
+
+
   end
 end

@@ -5,5 +5,6 @@ module DomoscioRails
     include DomoscioRails::HTTPCalls::Fetch
     include DomoscioRails::HTTPCalls::Update
     include DomoscioRails::HTTPCalls::Destroy
+    include DomoscioRails::HTTPCalls::Util
   end
 end
