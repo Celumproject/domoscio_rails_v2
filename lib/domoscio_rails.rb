@@ -45,7 +45,7 @@ module DomoscioRails
 
   class Configuration
     attr_accessor :preproduction, :test, :dev, :root_url,
-    :client_id, :client_passphrase,
+    :client_id, :client_passphrase, :client_identifier,
     :temp_dir, :disabled, :version
 
     def disabled
@@ -193,6 +193,7 @@ module DomoscioRails
 
   def self.request_headers
     auth_token = DomoscioRails::AuthorizationToken::Manager.get_token
+    client_identifier = DomoscioRails.configuration.client_identifier
 
     if !auth_token.is_a? String
       headers = {
@@ -208,6 +209,8 @@ module DomoscioRails
         'Content-Type' => 'application/json'
       }
     end
+    headers['VizToken'] = client_identifier if !client_identifier.nil?
+
     headers
 
   end
