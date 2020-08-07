@@ -63,6 +63,7 @@ module DomoscioRails
       end
 
       def file_path
+        @temp_dir = DomoscioRails.configuration.temp_dir if @temp_dir != DomoscioRails.configuration.temp_dir
         File.join(@temp_dir, "DomoscioRails.AuthorizationToken.FileStore.tmp")
       end
     end
