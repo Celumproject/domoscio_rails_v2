@@ -72,11 +72,11 @@ module DomoscioRails
     def root_url
       if @preproduction == true
         if @test == true
-          @root_url || "https://domoscio-adaptive-engine-staging.azurewebsites.net"
+          @root_url || "https://staging.adaptive-engine.domoscio.com"
         elsif @dev == true
-          @root_url || "https://domoscio-adaptive-engine-preprod.azurewebsites.net"
+          @root_url || "https://preprod.adaptive-engine.domoscio.com"
         else
-          @root_url || "https://domoscio-adaptive-engine.azurewebsites.net"
+          @root_url || "https://adaptive-engine.domoscio.com"
         end
       else
         @root_url || "http://localhost:3001"
