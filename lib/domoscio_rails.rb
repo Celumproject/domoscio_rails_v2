@@ -45,9 +45,7 @@ require 'domoscio_rails/metadata/delta_object'
 module DomoscioRails
 
   class Configuration
-    attr_accessor :preproduction, :test, :dev, :root_url,
-    :client_id, :client_passphrase, :client_identifier,
-    :temp_dir, :disabled, :version
+    attr_accessor :preproduction, :test, :dev, :root_url, :client_id, :client_passphrase, :temp_dir, :disabled, :version
 
     def disabled
       @disabled || false
@@ -141,24 +139,6 @@ module DomoscioRails
 
       end
     end
-
-    ############### TEMP!!!! #######################################################
-    #pp method, uri.request_uri, params #, filters, headers
-    #pp res, data
-    #puts
-
-    # if (!(res.is_a? Net::HTTPOK))
-    #   ex = DomoscioRails::ResponseError.new(uri, res.code, data)
-    #   ############## TEMP!!!! ########################################################
-    #   #pp ex, data
-    #   raise ex
-    # end
-
-    # copy pagination info if any
-    # ['x-number-of-pages', 'x-number-of-items'].each { |k|
-#       filters[k.gsub('x-number-of-', 'total_')] = res[k].to_i if res[k]
-#     }
-
     data
   end
 
@@ -194,7 +174,6 @@ module DomoscioRails
 
   def self.request_headers
     auth_token = DomoscioRails::AuthorizationToken::Manager.get_token
-    client_identifier = DomoscioRails.configuration.client_identifier
 
     if !auth_token.is_a? String
       headers = {
@@ -210,11 +189,6 @@ module DomoscioRails
         'Content-Type' => 'application/json'
       }
     end
-    headers['VizToken'] = client_identifier if !client_identifier.nil?
-
     headers
-
   end
-
-
 end
