@@ -1,8 +1,6 @@
 module DomoscioRails
   module AuthorizationToken
-
     class Manager
-
       class << self
         def storage
           @@storage ||= FileStorage.new
@@ -19,7 +17,6 @@ module DomoscioRails
         end
       end
     end
-
     class StaticStorage
       def get
         @@token ||= nil
@@ -63,7 +60,7 @@ module DomoscioRails
       end
 
       def file_path
-        @temp_dir = DomoscioRails.configuration.temp_dir if @temp_dir != DomoscioRails.configuration.temp_dir
+        @temp_dir = DomoscioRails.configuration.temp_dir
         File.join(@temp_dir, "DomoscioRails.AuthorizationToken.FileStore.tmp")
       end
     end

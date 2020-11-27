@@ -1,16 +1,13 @@
 module DomoscioRails
-  # @abstract
   class Resource
     class << self
       def class_name
         name.split('::')[-1]
       end
-
       def url(id = nil, util_name = nil, on_self = nil )
         if self == Resource
           raise NotImplementedError.new('Resource is an abstract class. Do not use it directly.')
         end
-        
         build_url = "/v#{DomoscioRails.configuration.version}/instances/#{DomoscioRails.configuration.client_id}"
         if !on_self
           build_url << "/#{class_name.underscore}s"
