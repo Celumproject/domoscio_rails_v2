@@ -2,13 +2,11 @@
 require 'net/https'
 require 'cgi/util'
 require 'multi_json'
-
 # helpers
 require 'domoscio_rails/version'
 require 'domoscio_rails/json'
 require 'domoscio_rails/errors'
 require 'domoscio_rails/authorization_token'
-
 # resources
 require 'domoscio_rails/http_calls'
 require 'domoscio_rails/resource'
@@ -41,9 +39,7 @@ require 'domoscio_rails/utils/gameplay_util'
 require 'domoscio_rails/utils/alerts_util'
 require 'domoscio_rails/utils/recommendation_util'
 require 'domoscio_rails/metadata/delta_object'
-
 module DomoscioRails
-
   class Configuration
     attr_accessor :preproduction, :test, :dev, :root_url, :client_id, :client_passphrase, :temp_dir, :disabled, :version
 
@@ -109,46 +105,54 @@ module DomoscioRails
     return false if @disabled
     uri = api_uri(url)
     uri.query = URI.encode_www_form(filters) unless filters.empty?
-
     res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
-
-    # decode json data
+    return res if res.kind_of? DomoscioRails::ProcessingError
     begin
-      data = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
-      unless (res.kind_of? Net::HTTPClientError) || (res.kind_of? Net::HTTPServerError)
-        DomoscioRails::AuthorizationToken::Manager.storage.store({access_token: res['Accesstoken'], refresh_token: res['Refreshtoken']})
+      unless res.kind_of? Net::HTTPSuccess
+        data = DomoscioRails::JSON.load((res.body.nil? ? '' : res.body), :symbolize_keys => true) 
+        raise ResponseError.new(uri, res.code.to_i, data)
       end
-    rescue MultiJson::LoadError
-      data = {}
+      data = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
+      DomoscioRails::AuthorizationToken::Manager.storage.store({access_token: res['Accesstoken'], refresh_token: res['Refreshtoken']})
+    rescue MultiJson::LoadError => exception
+      data = ProcessingError.new(uri, 500, exception)
+    rescue ResponseError => exception
+      data = exception
     end
 
     if res['Total'] && !filters[:page]
       pagetotal = (res['Total'].to_i / res['Per-Page'].to_f).ceil
-
       for j in 2..pagetotal
-        params = params.merge({page: j})
-        res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
-
-        # decode json data
+        res = DomoscioRails.send_request(uri, method, params.merge({page: j}), headers, before_request_proc)
+        return res if res.kind_of? DomoscioRails::ProcessingError
         begin
-          data += DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
+          unless res.kind_of? Net::HTTPSuccess
+            body = DomoscioRails::JSON.load((res.body.nil? ? '' : res.body), :symbolize_keys => true) 
+            raise ResponseError.new(uri, res.code.to_i, body)
+          end
+          body = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
+          data += body
           data.flatten!
-        rescue MultiJson::LoadError
-          data = {}
+        rescue MultiJson::LoadError => exception
+          return ProcessingError.new(uri, 500, exception)
+        rescue ResponseError => exception
+          return exception
         end
-
       end
     end
     data
   end
 
-
   def self.send_request(uri, method, params, headers, before_request_proc)
-    res = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http| # , use_ssl: uri.scheme == 'https') do |http|
-      req = Net::HTTP::const_get(method.capitalize).new(uri.request_uri, headers)
-      req.body = DomoscioRails::JSON.dump(params)
-      before_request_proc.call(req) if before_request_proc
-      http.request req
+    begin
+      res = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
+        req = Net::HTTP::const_get(method.capitalize).new(uri.request_uri, headers)
+        req.body = DomoscioRails::JSON.dump(params)
+        before_request_proc.call(req) if before_request_proc
+        http.request req
+      end
+    rescue Timeout::Error, Errno::EINVAL, Errno::ECONNREFUSED, Errno::ECONNRESET, EOFError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => exception
+      ProcessingError.new(uri, 500, exception)
     end
   end
 
@@ -156,7 +160,6 @@ module DomoscioRails
 
   def self.user_agent
     @uname ||= get_uname
-
     {
       bindings_version: DomoscioRails::VERSION,
       lang: 'ruby',
@@ -177,15 +180,15 @@ module DomoscioRails
 
     if !auth_token.is_a? String
       headers = {
-        'user_agent' => "DomoscioRails V2 RubyBindings/#{DomoscioRails::VERSION}",
+        'user_agent' => "#{DomoscioRails.user_agent}",
         'AccessToken' => "#{auth_token[:access_token]}",
         'RefreshToken' => "#{auth_token[:refresh_token]}",
         'Content-Type' => 'application/json'
       }
     else
       headers = {
-        'user_agent' => "DomoscioRails V2 RubyBindings/#{DomoscioRails::VERSION}",
-        'Authorization' => "Token token=#{DomoscioRails.configuration.client_passphrase}",#"#{auth_token['token_type']} #{auth_token['access_token']}",
+        'user_agent' => "#{DomoscioRails.user_agent}",
+        'Authorization' => "Token token=#{DomoscioRails.configuration.client_passphrase}",
         'Content-Type' => 'application/json'
       }
     end
