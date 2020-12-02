@@ -110,12 +110,12 @@ module DomoscioRails
     begin
       unless res.kind_of? Net::HTTPSuccess
         data = DomoscioRails::JSON.load((res.body.nil? ? '' : res.body), :symbolize_keys => true) 
-        raise ResponseError.new(uri, res.code.to_i, data)
+        raise ResponseError.new(uri, res.code.to_i, data, res.body)
       end
       data = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
       DomoscioRails::AuthorizationToken::Manager.storage.store({access_token: res['Accesstoken'], refresh_token: res['Refreshtoken']})
     rescue MultiJson::LoadError => exception
-      data = ProcessingError.new(uri, 500, exception)
+      data = ProcessingError.new(uri, 500, exception, res.body)
     rescue ResponseError => exception
       data = exception
     end
@@ -128,13 +128,13 @@ module DomoscioRails
         begin
           unless res.kind_of? Net::HTTPSuccess
             body = DomoscioRails::JSON.load((res.body.nil? ? '' : res.body), :symbolize_keys => true) 
-            raise ResponseError.new(uri, res.code.to_i, body)
+            raise ResponseError.new(uri, res.code.to_i, body, res.body)
           end
           body = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
           data += body
           data.flatten!
         rescue MultiJson::LoadError => exception
-          return ProcessingError.new(uri, 500, exception)
+          return ProcessingError.new(uri, 500, exception, res.body)
         rescue ResponseError => exception
           return exception
         end
@@ -152,7 +152,7 @@ module DomoscioRails
         http.request req
       end
     rescue Timeout::Error, Errno::EINVAL, Errno::ECONNREFUSED, Errno::ECONNRESET, EOFError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => exception
-      ProcessingError.new(uri, 500, exception)
+      ProcessingError.new(uri, 500, exception, res.body)
     end
   end
 
