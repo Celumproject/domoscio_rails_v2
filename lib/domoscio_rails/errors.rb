@@ -5,10 +5,9 @@ module DomoscioRails
 
   # Error Message from AdaptiveEngine
   class ResponseError < Error
-    attr_reader :request_url, :code, :details
-
-    def initialize(request_url, code, details)
-      @request_url, @code, @details = request_url, code, details
+    attr_reader :request_url, :code, :details, :body
+    def initialize(request_url, code, details, body)
+      @request_url, @code, @details, @body = request_url, code, details, body
       super(message) if message
     end
     def message; @details.dig(:error, :message) || @details; end
@@ -16,9 +15,9 @@ module DomoscioRails
 
   # Error Message from DomoscioRails
   class ProcessingError < Error
-    attr_reader :request_url, :code, :details
-    def initialize(request_url, code, details)
-      @request_url, @code, @details = request_url, code, details
+    attr_reader :request_url, :code, :details, :body
+    def initialize(request_url, code, details, body)
+      @request_url, @code, @details, @body = request_url, code, details, body
       super(message) if message
     end
     def message; @details.message; end
