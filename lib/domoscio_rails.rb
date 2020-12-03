@@ -110,12 +110,12 @@ module DomoscioRails
     begin
       unless res.kind_of? Net::HTTPSuccess
         data = DomoscioRails::JSON.load((res.body.nil? ? '' : res.body), :symbolize_keys => true) 
-        raise ResponseError.new(uri, res.code.to_i, data, res.body)
+        raise ResponseError.new(uri, res.code.to_i, data, res.body, params)
       end
       data = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
       DomoscioRails::AuthorizationToken::Manager.storage.store({access_token: res['Accesstoken'], refresh_token: res['Refreshtoken']})
     rescue MultiJson::LoadError => exception
-      data = ProcessingError.new(uri, 500, exception, res.body)
+      data = ProcessingError.new(uri, 500, exception, res.body, params)
     rescue ResponseError => exception
       data = exception
     end
@@ -128,13 +128,13 @@ module DomoscioRails
         begin
           unless res.kind_of? Net::HTTPSuccess
             body = DomoscioRails::JSON.load((res.body.nil? ? '' : res.body), :symbolize_keys => true) 
-            raise ResponseError.new(uri, res.code.to_i, body, res.body)
+            raise ResponseError.new(uri, res.code.to_i, body, res.body, params)
           end
           body = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
           data += body
           data.flatten!
         rescue MultiJson::LoadError => exception
-          return ProcessingError.new(uri, 500, exception, res.body)
+          return ProcessingError.new(uri, 500, exception, res.body, params)
         rescue ResponseError => exception
           return exception
         end
