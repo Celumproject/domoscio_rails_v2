@@ -108,10 +108,7 @@ module DomoscioRails
     res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
     return res if res.kind_of? DomoscioRails::ProcessingError
     begin
-      unless res.kind_of? Net::HTTPSuccess
-        data = DomoscioRails::JSON.load((res.body.nil? ? '' : res.body), :symbolize_keys => true) 
-        raise ResponseError.new(uri, res.code.to_i, data, res.body, params)
-      end
+      raise_http_failure(res, params)
       data = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
       DomoscioRails::AuthorizationToken::Manager.storage.store({access_token: res['Accesstoken'], refresh_token: res['Refreshtoken']})
     rescue MultiJson::LoadError => exception
@@ -126,10 +123,7 @@ module DomoscioRails
         res = DomoscioRails.send_request(uri, method, params.merge({page: j}), headers, before_request_proc)
         return res if res.kind_of? DomoscioRails::ProcessingError
         begin
-          unless res.kind_of? Net::HTTPSuccess
-            body = DomoscioRails::JSON.load((res.body.nil? ? '' : res.body), :symbolize_keys => true) 
-            raise ResponseError.new(uri, res.code.to_i, body, res.body, params)
-          end
+          raise_http_failure(res, params)
           body = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
           data += body
           data.flatten!
@@ -158,6 +152,16 @@ module DomoscioRails
 
   private
 
+  def raise_http_failure(res, params)
+    unless res.kind_of? Net::HTTPSuccess
+      if res.blank?
+        raise ResponseError.new(uri, 500, {error: {status: 500, message: 'AdaptiveEngine not available'}}, {}, params)
+      else
+        body = DomoscioRails::JSON.load((res.body.nil? ? '' : res.body), :symbolize_keys => true)
+        raise ResponseError.new(uri, res.code.to_i, body, res.body, params)
+      end
+    end
+  end
   def self.user_agent
     @uname ||= get_uname
     {
@@ -177,7 +181,6 @@ module DomoscioRails
 
   def self.request_headers
     auth_token = DomoscioRails::AuthorizationToken::Manager.get_token
-
     if !auth_token.is_a? String
       headers = {
         'user_agent' => "#{DomoscioRails.user_agent}",
