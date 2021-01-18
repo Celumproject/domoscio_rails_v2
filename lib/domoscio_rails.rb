@@ -148,7 +148,7 @@ module DomoscioRails
         http.request req
       end
     rescue Timeout::Error, Errno::EINVAL, Errno::ECONNREFUSED, Errno::ECONNRESET, EOFError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => exception
-      ProcessingError.new(uri, 500, exception, res.body)
+      ProcessingError.new(uri, 500, exception, res)
     end
   end
 
@@ -164,6 +164,7 @@ module DomoscioRails
       end
     end
   end
+
   def self.user_agent
     @uname ||= get_uname
     {
