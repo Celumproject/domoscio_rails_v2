@@ -37,18 +37,13 @@ module DomoscioRails
 
     module Fetch
       module ClassMethods
-        def fetch(id_or_filters = nil)
-          id, filters = DomoscioRails::HTTPCalls::Fetch.parse_id_or_filters(id_or_filters)
-          response = DomoscioRails.request(:get, url(id), {}, filters)
+        def fetch(id = nil, params = {})
+          DomoscioRails.request(:get, url(id), params)
         end
       end
 
       def self.included(base)
         base.extend(ClassMethods)
-      end
-
-      def self.parse_id_or_filters(id_or_filters = nil)
-        id_or_filters.is_a?(Hash) ? [nil, id_or_filters] : [id_or_filters, {}]
       end
     end
 
@@ -78,7 +73,5 @@ module DomoscioRails
         base.extend(ClassMethods)
       end
     end
-
-
   end
 end
