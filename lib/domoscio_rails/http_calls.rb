@@ -8,7 +8,6 @@ module DomoscioRails
           DomoscioRails.request(:post, url(id), params)
         end
       end
-
       def self.included(base)
         base.extend(ClassMethods)
       end
@@ -20,7 +19,6 @@ module DomoscioRails
           DomoscioRails.request(:put, url(id), params)
         end
       end
-
       def self.included(base)
         base.extend(ClassMethods)
       end
@@ -32,7 +30,6 @@ module DomoscioRails
           DomoscioRails.request(:put, url(nil, nil, true), params)
         end
       end
-
       def self.included(base)
         base.extend(ClassMethods)
       end

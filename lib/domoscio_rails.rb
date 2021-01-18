@@ -110,7 +110,7 @@ module DomoscioRails
     res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
     return res if res.kind_of? DomoscioRails::ProcessingError
     begin
-      raise_http_failure(res, params)
+      raise_http_failure(uri, res, params)
       data = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
       DomoscioRails::AuthorizationToken::Manager.storage.store({access_token: res['Accesstoken'], refresh_token: res['Refreshtoken']})
     rescue MultiJson::LoadError => exception
@@ -125,7 +125,7 @@ module DomoscioRails
         res = DomoscioRails.send_request(uri, method, params.merge({page: j}), headers, before_request_proc)
         return res if res.kind_of? DomoscioRails::ProcessingError
         begin
-          raise_http_failure(res, params)
+          raise_http_failure(uri, res, params)
           body = DomoscioRails::JSON.load(res.body.nil? ? '' : res.body)
           data += body
           data.flatten!
@@ -154,7 +154,7 @@ module DomoscioRails
 
   private
 
-  def raise_http_failure(res, params)
+  def self.raise_http_failure(uri, res, params)
     unless res.kind_of? Net::HTTPSuccess
       if res.blank?
         raise ResponseError.new(uri, 500, {error: {status: 500, message: 'AdaptiveEngine not available'}}, {}, params)
