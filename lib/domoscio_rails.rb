@@ -10,71 +10,39 @@ require 'domoscio_rails/authorization_token'
 # resources
 require 'domoscio_rails/http_calls'
 require 'domoscio_rails/resource'
-require 'domoscio_rails/adaptative/deterministic/path_rule'
-require 'domoscio_rails/adaptative/deterministic/rule_input'
-require 'domoscio_rails/adaptative/deterministic/rule_output'
-require 'domoscio_rails/adaptative/deterministic/rule_condition'
-require 'domoscio_rails/adaptative/predictive/objective'
-require 'domoscio_rails/adaptative/predictive/objective_student'
-require 'domoscio_rails/adaptative/predictive/objective_knowledge_node'
-require 'domoscio_rails/adaptative/predictive/objective_knowledge_node_student'
-require 'domoscio_rails/adaptative/recommendation'
-require 'domoscio_rails/path/learning_path'
-require 'domoscio_rails/content/content'
-require 'domoscio_rails/content/knowledge_node_content'
-require 'domoscio_rails/student/student'
-require 'domoscio_rails/student/student_cluster'
-require 'domoscio_rails/knowledge/knowledge_graph'
-require 'domoscio_rails/knowledge/knowledge_edge'
-require 'domoscio_rails/knowledge/knowledge_node'
-require 'domoscio_rails/metadata/tag'
-require 'domoscio_rails/metadata/tagging'
-require 'domoscio_rails/metadata/tag_set'
-require 'domoscio_rails/metadata/tag_edge'
-require 'domoscio_rails/data/knowledge_node_student'
-require 'domoscio_rails/data/event'
-require 'domoscio_rails/data/learning_session'
-require 'domoscio_rails/utils/review_util'
-require 'domoscio_rails/utils/gameplay_util'
-require 'domoscio_rails/utils/alerts_util'
-require 'domoscio_rails/utils/recommendation_util'
-require 'domoscio_rails/metadata/delta_object'
+require 'domoscio_rails/data/content.rb'
+require 'domoscio_rails/data/event.rb'
+require 'domoscio_rails/data/instance.rb'
+require 'domoscio_rails/data/learning_session.rb'
+require 'domoscio_rails/data/student.rb'
+require 'domoscio_rails/knowledge/knowledge_edge.rb'
+require 'domoscio_rails/knowledge/knowledge_graph.rb'
+require 'domoscio_rails/knowledge/knowledge_node_content.rb'
+require 'domoscio_rails/knowledge/knowledge_node_student.rb'
+require 'domoscio_rails/knowledge/knowledge_node.rb'
+require 'domoscio_rails/objective/objective_knowledge_node_student.rb'
+require 'domoscio_rails/objective/objective_knowledge_node.rb'
+require 'domoscio_rails/objective/objective_student.rb'
+require 'domoscio_rails/objective/objective.rb'
+require 'domoscio_rails/tag/tag_edge.rb'
+require 'domoscio_rails/tag/tag_set.rb'
+require 'domoscio_rails/tag/tag.rb'
+require 'domoscio_rails/tag/tagging.rb'
+require 'domoscio_rails/utils/gameplay_util.rb'
+require 'domoscio_rails/utils/recommendation_util.rb'
+require 'domoscio_rails/utils/review_util.rb'
+
 module DomoscioRails
   class Configuration
-    attr_accessor :preproduction, :test, :dev, :root_url, :client_id, :client_passphrase, :temp_dir, :disabled, :version
+    attr_accessor :root_url, :client_id, :client_passphrase, :temp_dir, :version
 
-    def disabled
-      @disabled || false
-    end
-
-    def preproduction
-      @preproduction || false
-    end
-
-    def test
-      @test || false
-    end
-
-    def dev
-      @dev || false
-    end
-
+    # Refers to AdaptiveEngine Version
     def version
-      @version || 1
+      @version || 2
     end
 
     def root_url
-      if @preproduction == true
-        if @test == true
-          @root_url || "https://staging.adaptive-engine.domoscio.com"
-        elsif @dev == true
-          @root_url || "https://preprod.adaptive-engine.domoscio.com"
-        else
-          @root_url || "https://adaptive-engine.domoscio.com"
-        end
-      else
-        @root_url || "http://localhost:3001"
-      end
+      @root_url || ""
     end
   end
 

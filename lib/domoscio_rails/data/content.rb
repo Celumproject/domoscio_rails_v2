@@ -1,6 +1,6 @@
 module DomoscioRails
-  # A PathRule.
-  class PathRule < Resource
+  # A Content.
+  class Content < Resource
     include DomoscioRails::HTTPCalls::Create
     include DomoscioRails::HTTPCalls::Fetch
     include DomoscioRails::HTTPCalls::Update
