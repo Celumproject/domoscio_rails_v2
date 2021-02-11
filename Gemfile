@@ -14,6 +14,4 @@ gemspec
 # gem 'debugger'
 
 gem 'rspec'
-gem 'capybara'
-gem 'capybara-webkit'
 gem 'multi_json'
