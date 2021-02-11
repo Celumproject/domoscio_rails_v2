@@ -71,8 +71,8 @@ module DomoscioRails
   #
   def self.request(method, url, params={}, filters={}, headers = request_headers, before_request_proc = nil)
     return false if @disabled
-    #sets a default page size of 50
-    params.merge!({'per_page': 50}) unless params['per_page']
+    # sets a default page size to 2k
+    params.merge!({'per_page': 2000}) unless params[:per_page]
     uri = api_uri(url)
     uri.query = URI.encode_www_form(filters) unless filters.empty?
     res = DomoscioRails.send_request(uri, method, params, headers, before_request_proc)
