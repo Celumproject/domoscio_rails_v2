@@ -11,9 +11,7 @@ module DomoscioRails
         end
 
         def get_token
-          token = storage.get
-          token = DomoscioRails.configuration.client_passphrase if token.nil?
-          token
+          storage.get
         end
       end
     end
@@ -29,13 +27,9 @@ module DomoscioRails
 
     class FileStorage
       require 'yaml'
-      @temp_dir
 
-      def initialize(temp_dir = nil)
-        @temp_dir = temp_dir || DomoscioRails.configuration.temp_dir
-        if !@temp_dir
-          raise "Path to temporary folder is not defined"
-        end
+      def initialize
+        raise "Path to temporary folder is not defined" unless DomoscioRails.configuration.temp_dir
       end
 
       def get
@@ -60,8 +54,7 @@ module DomoscioRails
       end
 
       def file_path
-        @temp_dir = DomoscioRails.configuration.temp_dir
-        File.join(@temp_dir, "DomoscioRails.AuthorizationToken.FileStore.tmp")
+        File.join(DomoscioRails.configuration.temp_dir, "DomoscioRails.AuthorizationToken.FileStore.tmp")
       end
     end
   end
