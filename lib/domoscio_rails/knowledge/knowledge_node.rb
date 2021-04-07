@@ -1,5 +1,4 @@
 module DomoscioRails
-  # A Knowledge Node.
   class KnowledgeNode < Resource
     
     include DomoscioRails::HTTPCalls::Create

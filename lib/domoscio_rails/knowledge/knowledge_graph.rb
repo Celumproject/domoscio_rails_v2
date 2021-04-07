@@ -1,5 +1,4 @@
 module DomoscioRails
-  # A Knowledge Graph.
   class KnowledgeGraph < Resource
     
     include DomoscioRails::HTTPCalls::Create

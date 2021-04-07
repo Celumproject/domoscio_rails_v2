@@ -1,5 +1,5 @@
 module DomoscioRails
-  class ObjectiveKnowledgeNode < Resource
+  class Recommendation < Resource
 
     include DomoscioRails::HTTPCalls::Fetch
 

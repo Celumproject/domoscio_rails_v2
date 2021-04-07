@@ -1,5 +1,4 @@
 module DomoscioRails
-  # A Knowledge Edge.
   class KnowledgeNodeStudent < Resource
     
     include DomoscioRails::HTTPCalls::Create
