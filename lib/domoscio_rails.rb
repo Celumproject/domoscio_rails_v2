@@ -131,8 +131,7 @@ module DomoscioRails
       if response.blank?
         raise ResponseError.new(uri, 500, {error: {status: 500, message: 'AdaptiveEngine not available'}}, {}, params)
       else
-        body = {error: {status: response.code, message: DomoscioRails::JSON.load((response.body.nil? ? '' : response.body), :symbolize_keys => true)}}
-        raise ResponseError.new(uri, response.code.to_i, body, response.body, params)
+        raise ResponseError.new(uri, response.code.to_i, DomoscioRails::JSON.load((response.body.nil? ? '' : response.body), :symbolize_keys => true), response.body, params)
       end
     end
   end
